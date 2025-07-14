@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+
+tasks.register('runZMQClientA', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.example.zmq.ZMQClient' // or 'org.example.zmq.ChatNode' if using a package
+    args = ['6001', '127.0.0.1:6002', '127.0.0.1:6003', '127.0.0.1:6004']
+    standardInput = System.in
+}
+
+tasks.register('runZMQClientB', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.example.zmq.ZMQClient'
+    args = ['6002', '127.0.0.1:6001', '127.0.0.1:6003', '127.0.0.1:6004']
+    standardInput = System.in
+}
+
+tasks.register('runZMQClientC', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.example.zmq.ZMQClient'
+    args = ['6003', '127.0.0.1:6001', '127.0.0.1:6002', '127.0.0.1:6004']
+    standardInput = System.in
+}
+
+tasks.register('runZMQClientD', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.example.zmq.ZMQClient'
+    args = ['6004', '127.0.0.1:6001', '127.0.0.1:6002', '127.0.0.1:6003']
+    standardInput = System.in
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation files('//home/samyog/Downloads/ociormvbahblockchain/JavaReedSolomon/build/libs/JavaReedSolomon.jar')
+    implementation 'org.zeromq:jeromq:0.5.2'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testCompileOnly 'org.projectlombok:lombok'
+}
+
+test {
+    useJUnitPlatform()
+}
