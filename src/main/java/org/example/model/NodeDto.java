@@ -10,6 +10,10 @@ public class NodeDto implements Cloneable {
     private String name;
     private String message;
 
+   private byte[] ri;
+   private  byte[] commitment;
+
+
     public String getId() {
         return id;
     }
@@ -34,6 +38,22 @@ public class NodeDto implements Cloneable {
         this.message = message;
     }
 
+
+    public byte[] getRi() {
+        return ri;
+    }
+
+    public void setRi(byte[] ri) {
+        this.ri = ri;
+    }
+
+    public byte[] getCommitment() {
+        return commitment;
+    }
+
+    public void setCommitment(byte[] commitment) {
+        this.commitment = commitment;
+    }
 
     @Override
     public String toString() {

@@ -4,7 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class ObjectParser {
@@ -13,6 +18,18 @@ public class ObjectParser {
         Random random = new Random();
         int value = random.nextInt(0x10000); // 0 to 0xFFFF
         return String.format("%04X", value); // e.g., "3A7F"
+    }
+
+    public static boolean parseValidHexMap(String input) {
+
+        // Accept only pairs like A01:313233 (key:hex)
+        Pattern pattern = Pattern.compile("([a-zA-Z0-9]+):([0-9a-fA-F]+)");
+
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -33,7 +50,13 @@ public class ObjectParser {
         return data;
     }
 
-    static String bytesToHex(byte[] bytes) {
+    public static String mapToHexString(Map<String, byte[]> map) {
+        return map.entrySet().stream()
+                .map(e -> e.getKey() + ":" + bytesToHex(e.getValue()))
+                .collect(Collectors.joining(","));
+    }
+
+    public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) sb.append(String.format("%02x", b));
         return sb.toString();
@@ -48,5 +71,19 @@ public class ObjectParser {
         } catch (Exception e) {
             return false;
         }
+    }
+
+
+    public static Map<String, byte[]> parseStringToByteMap(String input) {
+        Map<String, byte[]> map = new HashMap<>();
+
+        String[] pairs = input.split(",");
+        for (String pair : pairs) {
+            String[] kv = pair.split(":");
+            if (kv.length == 2) {
+                map.put(kv[0], hexToBytes(kv[1]));
+            }
+        }
+        return map;
     }
 }

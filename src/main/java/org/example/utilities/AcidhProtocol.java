@@ -96,6 +96,7 @@ public class AcidhProtocol {
                 ObjectParser.hexToBytes(commitment));
 
         if (verified) {
+            nodeDto.setCommitment(commitment.getBytes());
             S_shares.put(id, new Share(commitment, share, proof));
             H_hash.put(commitment, nodeId);
             sendVote(id, commitment, nodeDto);
