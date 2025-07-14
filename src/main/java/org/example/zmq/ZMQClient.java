@@ -131,6 +131,7 @@ public class ZMQClient {
                     pub.send(serialized);
                 } else {
                    int leader= LeaderProtocal.getLeader(commits.get(), nodeDtoList);
+                   logger.info("leader {}", leader);
                 }
             } catch (Exception exception) {
                 logger.error(" Error while writing {} ", exception);
