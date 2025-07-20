@@ -16,6 +16,7 @@ import org.zeromq.ZMQ;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.example.utilities.CoinCommitReveal.generateRandomBytes;
 import static org.example.utilities.ObjectParser.mapToHexString;
 import static org.example.utilities.ObjectParser.parseValidHexMap;
 
@@ -49,8 +50,8 @@ public class ZMQClient {
 
             Thread receiver = new Thread(() -> {
                 while (!Thread.currentThread().isInterrupted()) {
-                    String msg = sub.recvStr();
-                    if (ObjectParser.isJsonList(msg)) {
+                   String msg = sub.recvStr();
+                    if (ObjectParser.isListOfNodeDto(msg)) {
                         try {
                             List<NodeDto> nodes = objectMapper.readValue(msg, new TypeReference<>() {
                             });
@@ -71,7 +72,6 @@ public class ZMQClient {
                     System.out.println("\n[Received] " + msg + "\n> ");
                 }
             });
-
             receiver.start();
             nodeDto.setId(ObjectParser.generate16BitUUID());
             System.out.println("your node id is  " + nodeDto.getId());
@@ -83,6 +83,7 @@ public class ZMQClient {
             System.out.println("Enter Message ");
             String message = scanner.nextLine();
             nodeDto.setMessage(message);
+            nodeDto.setRi(generateRandomBytes());
             System.out.println("message is " + nodeDto.getMessage());
             if (!nodeDtos.contains(nodeDto)) {
                 nodeDtos.add(nodeDto.clone());
@@ -102,7 +103,7 @@ public class ZMQClient {
                 pub.send(locMsg);
                 logger.info(locMsg);
                 String readyMessage = objectMapper.writeValueAsString(AcidhProtocol.readyMessage);
-                pub.send(readyMessage);
+               pub.send(readyMessage);
                 logger.info(readyMessage);
                 String finishMessage = objectMapper.writeValueAsString(AcidhProtocol.finishMessage);
                 pub.send(finishMessage);
@@ -120,6 +121,7 @@ public class ZMQClient {
                      maps.forEach(stringShareMap -> {
                          Share share=stringShareMap.get(nodeDto1.getId());
                          nodeDto1.setCommitment(share.getCommitment().getBytes());
+
                          logger.info("Commitment {}", nodeDto1.getCommitment());
                      });
                     }
@@ -131,10 +133,12 @@ public class ZMQClient {
                 pub.send(shareJson);
                 if(Objects.isNull(commits.get())) {
                     Map<String, byte[]> commit = CoinCommitReveal.commitPhase(nodeDtoList);
+
                     String serialized = mapToHexString(commit);
                     logger.info("pushed data {}", serialized);
-                    pub.send(serialized);
+                   pub.send(serialized);
                 } else {
+                    logger.info("leader {}", commits.get());
                    int leader= LeaderProtocal.getLeader(commits.get(), nodeDtoList);
                    logger.info("leader {}", leader);
                 }

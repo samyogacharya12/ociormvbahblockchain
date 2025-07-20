@@ -1,10 +1,13 @@
 package org.example.utilities;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
+import org.example.model.NodeDto;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -62,17 +65,47 @@ public class ObjectParser {
         return sb.toString();
     }
 
-    public static boolean isJsonList(String str) {
-        if (str == null) return false;
+    public static boolean isListOfNodeDto(String json) {
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.readTree(str);
-            return node.isArray();  // this is the correct way to check for JSON list
+            // Try to parse as List<NodeDto>
+            List<NodeDto> nodeList = mapper.readValue(json, new TypeReference<List<NodeDto>>() {});
+            return true;
         } catch (Exception e) {
             return false;
         }
     }
 
+    public static boolean isJsonList(String str) {
+        if (str == null) return false;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(str);
+            if (!node.isArray()) return false;
+            for (JsonNode item : node) {
+                if (containsMap(item)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean containsMap(JsonNode node) {
+        if (node.isObject()) {
+            return true;
+        }
+
+        if (node.isArray()) {
+            for (JsonNode child : node) {
+                if (containsMap(child)) return true;
+            }
+        }
+
+        return false;
+    }
 
     public static Map<String, byte[]> parseStringToByteMap(String input) {
         Map<String, byte[]> map = new HashMap<>();

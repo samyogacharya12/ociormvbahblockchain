@@ -3,6 +3,7 @@ package org.example;
 import org.example.model.NodeDto;
 import org.example.utilities.AcidhProtocol;
 import org.example.utilities.CoinCommitReveal;
+import org.example.utilities.ObjectParser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -16,6 +17,6 @@ import static org.example.utilities.ObjectParser.*;
 
 public class Main {
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+            SpringApplication.run(Main.class, args);
     }
 }

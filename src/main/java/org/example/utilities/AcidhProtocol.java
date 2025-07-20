@@ -73,7 +73,7 @@ public class AcidhProtocol {
             for (int j = 1; j <= N; j++) {
                 byte[] yj = shares[j-1];
                 if(Objects.nonNull(yj)) {
-                    List<byte[]> proof = tree.getProof(j);
+                    List<byte[]> proof = tree.getProof(j-1);
                     if (Objects.nonNull(proof)) {
                         share.setProof(proof);
                         share.setShare(yj);

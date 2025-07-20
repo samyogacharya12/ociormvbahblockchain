@@ -13,8 +13,8 @@ public class CoinCommitReveal {
     public static Map<String, byte[]> commitPhase(List<NodeDto> nodes) {
         Map<String, byte[]> commitments = new HashMap<>();
         for (NodeDto node : nodes) {
-            node.setRi(generateRandomBytes());
             if(Objects.nonNull(node.getCommitment())) {
+                commitments.put(node.getName(),node.getRi());
                 commitments.put(node.getId(), node.getCommitment());
             }
         }

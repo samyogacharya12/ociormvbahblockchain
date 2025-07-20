@@ -1,8 +1,6 @@
 package org.example.model;
 
 
-import lombok.*;
-
 
 public class NodeDto implements Cloneable {
 
