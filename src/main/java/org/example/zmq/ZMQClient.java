@@ -23,6 +23,7 @@ import static org.example.utilities.ObjectParser.parseValidHexMap;
 public class ZMQClient {
 
     public static void main(String[] args) {
+        Integer leader=null;
         Logger logger = LoggerFactory.getLogger(ZMQClient.class);
         NodeDto nodeDto = new NodeDto();
         AtomicReference<Map<String, byte[]>> commits = new AtomicReference<>();
@@ -133,14 +134,17 @@ public class ZMQClient {
                     logger.info("commitment is not present");
                     Map<String, byte[]> commit = CoinCommitReveal.commitPhase(nodeDtoList);
                     String serialized = mapToHexString(commit);
+                    leader= LeaderProtocal.getLeader(commit, nodeDtoList);
+                    logger.info("leader {}", leader);
                     pub.send(serialized);
+
                 } else {
                     logger.info("leader {}", commits.get());
-                   int leader= LeaderProtocal.getLeader(commits.get(), nodeDtoList);
+                    leader= LeaderProtocal.getLeader(commits.get(), nodeDtoList);
                    logger.info("leader {}", leader);
                 }
             } catch (Exception exception) {
-                logger.error(" Error while writing {} ", exception);
+                logger.error("Error while writing {} ", exception);
             }
             while (true) {
                 System.out.print("> ");
