@@ -64,29 +64,30 @@ public class AcidhProtocol {
                                                     byte[][] shares,
                                                     MerkleTree tree){
         Logger logs=LoggerFactory.getLogger(AcidhProtocol.class);
+        List<Map<String, Share>> listOfMaps = new ArrayList<>();
         try {
-            List<Map<String, Share>> listOfMaps = new ArrayList<>();
             Map<String, Share> shareMap = new HashMap<>();
             Share share = new Share();
             String commitment = ObjectParser.bytesToHex(tree.buildRoot());
             share.setCommitment(commitment);
             for (int j = 1; j <= N; j++) {
                 byte[] yj = shares[j-1];
-                List<byte[]> proof = tree.getProof(j);
-                if(Objects.nonNull(proof)) {
-                    share.setProof(proof);
-                    share.setShare(yj);
-                    shareMap.put(nodeDto.getId(), share);
-                    listOfMaps.add(shareMap);
-                    sendShare(nodeDto.getId(), commitment, share.getShare(), proof, j
-                            , nodeDto);
+                if(Objects.nonNull(yj)) {
+                    List<byte[]> proof = tree.getProof(j);
+                    if (Objects.nonNull(proof)) {
+                        share.setProof(proof);
+                        share.setShare(yj);
+                        shareMap.put(nodeDto.getId(), share);
+                        listOfMaps.add(shareMap);
+                        sendShare(nodeDto.getId(), commitment, share.getShare(), proof, j
+                                , nodeDto);
+                    }
                 }
             }
-            return listOfMaps;
         } catch (Exception exception){
              logs.error("processAcidhInstances {}",exception);
         }
-        return null;
+        return listOfMaps;
     }
 
     public static void sendShare(String id, String commitment, byte[] share,

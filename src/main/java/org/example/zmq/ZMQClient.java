@@ -120,10 +120,15 @@ public class ZMQClient {
                      maps.forEach(stringShareMap -> {
                          Share share=stringShareMap.get(nodeDto1.getId());
                          nodeDto1.setCommitment(share.getCommitment().getBytes());
+                         logger.info("Commitment {}", nodeDto1.getCommitment());
                      });
                     }
                 });
-
+                nodeDtoList.forEach(nodeDto1 -> {
+                    System.out.println(" Commitment " +nodeDto1.getCommitment());
+                });
+                String shareJson = objectMapper.writeValueAsString(nodeDtoList);
+                pub.send(shareJson);
                 if(Objects.isNull(commits.get())) {
                     Map<String, byte[]> commit = CoinCommitReveal.commitPhase(nodeDtoList);
                     String serialized = mapToHexString(commit);
