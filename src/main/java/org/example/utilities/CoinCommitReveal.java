@@ -14,7 +14,6 @@ public class CoinCommitReveal {
         Map<String, byte[]> commitments = new HashMap<>();
         for (NodeDto node : nodes) {
             if(Objects.nonNull(node.getCommitment())) {
-                commitments.put(node.getName(),node.getRi());
                 commitments.put(node.getId(), node.getCommitment());
             }
         }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import org.example.model.NodeDto;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class ObjectParser {
+
 
     public static String generate16BitUUID() {
         Random random = new Random();
@@ -108,6 +110,7 @@ public class ObjectParser {
     }
 
     public static Map<String, byte[]> parseStringToByteMap(String input) {
+        System.out.println("parseStringToByteMap"+input);
         Map<String, byte[]> map = new HashMap<>();
 
         String[] pairs = input.split(",");

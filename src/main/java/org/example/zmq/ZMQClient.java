@@ -67,6 +67,7 @@ public class ZMQClient {
                         logger.info("pushed data {}", msg);
                         final Map<String, byte[]> parseStringToByteMap = ObjectParser.parseStringToByteMap(msg);
                         commits.set(parseStringToByteMap);
+                        logger.info("commits");
                     }
 
                     System.out.println("\n[Received] " + msg + "\n> ");
@@ -103,7 +104,7 @@ public class ZMQClient {
                 pub.send(locMsg);
                 logger.info(locMsg);
                 String readyMessage = objectMapper.writeValueAsString(AcidhProtocol.readyMessage);
-               pub.send(readyMessage);
+                pub.send(readyMessage);
                 logger.info(readyMessage);
                 String finishMessage = objectMapper.writeValueAsString(AcidhProtocol.finishMessage);
                 pub.send(finishMessage);
@@ -120,23 +121,19 @@ public class ZMQClient {
                     if(maps!=null){
                      maps.forEach(stringShareMap -> {
                          Share share=stringShareMap.get(nodeDto1.getId());
-                         nodeDto1.setCommitment(share.getCommitment().getBytes());
-
-                         logger.info("Commitment {}", nodeDto1.getCommitment());
+                         if(Objects.nonNull(share) && Objects.nonNull(share.getCommitment())) {
+                             nodeDto1.setCommitment(share.getCommitment().getBytes());
+                         }
                      });
                     }
-                });
-                nodeDtoList.forEach(nodeDto1 -> {
-                    System.out.println(" Commitment " +nodeDto1.getCommitment());
                 });
                 String shareJson = objectMapper.writeValueAsString(nodeDtoList);
                 pub.send(shareJson);
                 if(Objects.isNull(commits.get())) {
+                    logger.info("commitment is not present");
                     Map<String, byte[]> commit = CoinCommitReveal.commitPhase(nodeDtoList);
-
                     String serialized = mapToHexString(commit);
-                    logger.info("pushed data {}", serialized);
-                   pub.send(serialized);
+                    pub.send(serialized);
                 } else {
                     logger.info("leader {}", commits.get());
                    int leader= LeaderProtocal.getLeader(commits.get(), nodeDtoList);
